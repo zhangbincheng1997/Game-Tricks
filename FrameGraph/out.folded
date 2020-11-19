@@ -1,0 +1,12 @@
+main1;__libc_start_main;main;a;b;c;d;e 1278
+main1;__libc_start_main;main;a;b;c;d;e;ret_from_intr;do_IRQ;irq_exit;do_softirq;call_softirq;__do_softirq;net_rx_action;virtnet_poll;napi_gro_receive;netif_receive_skb_internal;__netif_receive_skb;__netif_receive_skb_core;ip_rcv;ip_rcv_finish;ip_local_deliver;ip_local_deliver_finish;tcp_v4_rcv;tcp_v4_do_rcv;tcp_rcv_established;__tcp_ack_snd_check;tcp_send_ack;tcp_transmit_skb;ip_queue_xmit 1
+main1;__libc_start_main;main;a;b;c;d;f 1
+main1;__libc_start_main;main;a;b;c;d;f;g 3117
+main1;__libc_start_main;main;a;b;c;d;f;g;apic_timer_interrupt;smp_apic_timer_interrupt;irq_exit;do_softirq;call_softirq;__do_softirq 1
+main1;__libc_start_main;main;a;b;c;d;f;g;apic_timer_interrupt;smp_apic_timer_interrupt;irq_exit;do_softirq;call_softirq;__do_softirq;rcu_process_callbacks;_raw_spin_unlock_irqrestore 2
+main1;__libc_start_main;main;a;b;c;d;f;g;ret_from_intr;do_IRQ;irq_exit;do_softirq;call_softirq;__do_softirq 1
+main1;__libc_start_main;main;a;b;c;d;f;g;ret_from_intr;do_IRQ;irq_exit;do_softirq;call_softirq;__do_softirq;blk_done_softirq;virtblk_request_done;blk_mq_end_request;blk_account_io_done;part_round_stats;part_in_flight;blk_mq_in_flight;bt_iter 1
+main1;__libc_start_main;main;a;b;c;d;f;g;ret_from_intr;do_IRQ;irq_exit;do_softirq;call_softirq;__do_softirq;net_rx_action;virtnet_poll;napi_gro_receive;netif_receive_skb_internal;__netif_receive_skb;__netif_receive_skb_core;ip_rcv;ip_rcv_finish;ip_local_deliver;ip_local_deliver_finish;tcp_v4_rcv;tcp_v4_send_reset;ip_send_unicast_reply;ip_push_pending_frames;ip_send_skb;ip_local_out_sk;ip_output;ip_finish_output;dev_queue_xmit;__dev_queue_xmit;sch_direct_xmit;dev_hard_start_xmit;start_xmit;virtqueue_kick;iowrite16 1
+main1;__libc_start_main;main;a;b;c;d;f;g;ret_from_intr;do_IRQ;irq_exit;do_softirq;call_softirq;__do_softirq;net_rx_action;virtnet_poll;napi_gro_receive;netif_receive_skb_internal;__netif_receive_skb;__netif_receive_skb_core;superios 1
+main1;__libc_start_main;main;a;h;i 1230
+main1;__libc_start_main;main;a;h;i;apic_timer_interrupt;smp_apic_timer_interrupt;irq_exit;do_softirq;call_softirq;__do_softirq;rcu_process_callbacks;rcu_report_qs_rnp;__wake_up;__wake_up_common_lock;_raw_spin_unlock_irqrestore 1

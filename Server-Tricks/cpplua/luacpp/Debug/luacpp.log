@@ -1,0 +1,34 @@
+﻿  average.cpp
+lua53.lib(lapi.obj) : warning LNK4099: 未找到 PDB“lua53.pdb”(使用“lua53.lib(lapi.obj)”或在“D:\code\cpplua\Debug\lua53.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua53.lib(lauxlib.obj) : warning LNK4099: 未找到 PDB“lua53.pdb”(使用“lua53.lib(lauxlib.obj)”或在“D:\code\cpplua\Debug\lua53.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua53.lib(lbaselib.obj) : warning LNK4099: 未找到 PDB“lua53.pdb”(使用“lua53.lib(lbaselib.obj)”或在“D:\code\cpplua\Debug\lua53.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua53.lib(lcode.obj) : warning LNK4099: 未找到 PDB“lua53.pdb”(使用“lua53.lib(lcode.obj)”或在“D:\code\cpplua\Debug\lua53.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua53.lib(lcorolib.obj) : warning LNK4099: 未找到 PDB“lua53.pdb”(使用“lua53.lib(lcorolib.obj)”或在“D:\code\cpplua\Debug\lua53.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua53.lib(lctype.obj) : warning LNK4099: 未找到 PDB“lua53.pdb”(使用“lua53.lib(lctype.obj)”或在“D:\code\cpplua\Debug\lua53.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua53.lib(ldblib.obj) : warning LNK4099: 未找到 PDB“lua53.pdb”(使用“lua53.lib(ldblib.obj)”或在“D:\code\cpplua\Debug\lua53.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua53.lib(ldebug.obj) : warning LNK4099: 未找到 PDB“lua53.pdb”(使用“lua53.lib(ldebug.obj)”或在“D:\code\cpplua\Debug\lua53.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua53.lib(ldo.obj) : warning LNK4099: 未找到 PDB“lua53.pdb”(使用“lua53.lib(ldo.obj)”或在“D:\code\cpplua\Debug\lua53.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua53.lib(ldump.obj) : warning LNK4099: 未找到 PDB“lua53.pdb”(使用“lua53.lib(ldump.obj)”或在“D:\code\cpplua\Debug\lua53.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua53.lib(lfunc.obj) : warning LNK4099: 未找到 PDB“lua53.pdb”(使用“lua53.lib(lfunc.obj)”或在“D:\code\cpplua\Debug\lua53.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua53.lib(lgc.obj) : warning LNK4099: 未找到 PDB“lua53.pdb”(使用“lua53.lib(lgc.obj)”或在“D:\code\cpplua\Debug\lua53.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua53.lib(linit.obj) : warning LNK4099: 未找到 PDB“lua53.pdb”(使用“lua53.lib(linit.obj)”或在“D:\code\cpplua\Debug\lua53.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua53.lib(liolib.obj) : warning LNK4099: 未找到 PDB“lua53.pdb”(使用“lua53.lib(liolib.obj)”或在“D:\code\cpplua\Debug\lua53.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua53.lib(llex.obj) : warning LNK4099: 未找到 PDB“lua53.pdb”(使用“lua53.lib(llex.obj)”或在“D:\code\cpplua\Debug\lua53.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua53.lib(lmathlib.obj) : warning LNK4099: 未找到 PDB“lua53.pdb”(使用“lua53.lib(lmathlib.obj)”或在“D:\code\cpplua\Debug\lua53.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua53.lib(lmem.obj) : warning LNK4099: 未找到 PDB“lua53.pdb”(使用“lua53.lib(lmem.obj)”或在“D:\code\cpplua\Debug\lua53.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua53.lib(loadlib.obj) : warning LNK4099: 未找到 PDB“lua53.pdb”(使用“lua53.lib(loadlib.obj)”或在“D:\code\cpplua\Debug\lua53.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua53.lib(lobject.obj) : warning LNK4099: 未找到 PDB“lua53.pdb”(使用“lua53.lib(lobject.obj)”或在“D:\code\cpplua\Debug\lua53.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua53.lib(lopcodes.obj) : warning LNK4099: 未找到 PDB“lua53.pdb”(使用“lua53.lib(lopcodes.obj)”或在“D:\code\cpplua\Debug\lua53.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua53.lib(loslib.obj) : warning LNK4099: 未找到 PDB“lua53.pdb”(使用“lua53.lib(loslib.obj)”或在“D:\code\cpplua\Debug\lua53.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua53.lib(lparser.obj) : warning LNK4099: 未找到 PDB“lua53.pdb”(使用“lua53.lib(lparser.obj)”或在“D:\code\cpplua\Debug\lua53.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua53.lib(lstate.obj) : warning LNK4099: 未找到 PDB“lua53.pdb”(使用“lua53.lib(lstate.obj)”或在“D:\code\cpplua\Debug\lua53.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua53.lib(lstring.obj) : warning LNK4099: 未找到 PDB“lua53.pdb”(使用“lua53.lib(lstring.obj)”或在“D:\code\cpplua\Debug\lua53.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua53.lib(lstrlib.obj) : warning LNK4099: 未找到 PDB“lua53.pdb”(使用“lua53.lib(lstrlib.obj)”或在“D:\code\cpplua\Debug\lua53.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua53.lib(ltable.obj) : warning LNK4099: 未找到 PDB“lua53.pdb”(使用“lua53.lib(ltable.obj)”或在“D:\code\cpplua\Debug\lua53.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua53.lib(ltablib.obj) : warning LNK4099: 未找到 PDB“lua53.pdb”(使用“lua53.lib(ltablib.obj)”或在“D:\code\cpplua\Debug\lua53.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua53.lib(ltm.obj) : warning LNK4099: 未找到 PDB“lua53.pdb”(使用“lua53.lib(ltm.obj)”或在“D:\code\cpplua\Debug\lua53.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua53.lib(lundump.obj) : warning LNK4099: 未找到 PDB“lua53.pdb”(使用“lua53.lib(lundump.obj)”或在“D:\code\cpplua\Debug\lua53.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua53.lib(lutf8lib.obj) : warning LNK4099: 未找到 PDB“lua53.pdb”(使用“lua53.lib(lutf8lib.obj)”或在“D:\code\cpplua\Debug\lua53.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua53.lib(lvm.obj) : warning LNK4099: 未找到 PDB“lua53.pdb”(使用“lua53.lib(lvm.obj)”或在“D:\code\cpplua\Debug\lua53.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua53.lib(lzio.obj) : warning LNK4099: 未找到 PDB“lua53.pdb”(使用“lua53.lib(lzio.obj)”或在“D:\code\cpplua\Debug\lua53.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+  luacpp.vcxproj -> D:\code\cpplua\Debug\luacpp.exe
