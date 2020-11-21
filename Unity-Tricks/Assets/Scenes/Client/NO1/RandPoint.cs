@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 
-public class RandPoint : MonoBehaviour
-{
+public class RandPoint : MonoBehaviour {
     public GameObject prefabs;
 
     private float x_center = 0;

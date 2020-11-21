@@ -479,7 +479,7 @@ print(Mydll.average(1,2,3,4))
 ```
 
 ```Shell
-g++ hello.cpp -shared -o Mydll.dll -llua54 -L . -I ./include
+g++ average.cpp -shared -o Mydll.dll -llua54 -L . -I ./include
 => Mydll.dll
 ```
 
@@ -1004,6 +1004,7 @@ g++ main1.cpp -o main1
 "workbench.colorTheme": "Default Light+",
 "workbench.iconTheme": "vscode-icons",
 "workbench.editor.enablePreview": false,
+"files.eol": "\n",
 ...
 "code-runner.runInTerminal": true,
 "code-runner.fileDirectoryAsCwd": true,
