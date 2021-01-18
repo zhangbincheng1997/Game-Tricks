@@ -12,8 +12,8 @@ public class RandPoint : MonoBehaviour {
         for (int i = 0; i < 1000; i++)
         {
             Vector3 pos = GetPoint();
-            GameObject g = Instantiate(prefabs, pos, Quaternion.identity);
-            g.GetComponent<MeshRenderer>().material.color = new Color(Random.Range(0, 1f), Random.Range(0, 1f), Random.Range(0, 1f));
+            GameObject gameObject = Instantiate(prefabs, pos, Quaternion.identity);
+            gameObject.GetComponent<MeshRenderer>().material.color = new Color(Random.Range(0, 1f), Random.Range(0, 1f), Random.Range(0, 1f));
         }
     }
 

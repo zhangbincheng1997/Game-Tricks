@@ -1,6 +1,6 @@
 ﻿Shader "Xray" {
     Properties {
-        _NotVisibleColor("NotVisibleColor (RGB)", Color) = (0.3,0.3,0.3,1)
+        _NotVisibleColor("NotVisibleColor (RGB)", Color) = (0.3, 0.3, 0.3, 1)
         _MainTex("Base (RGB)", 2D) = "white" {}
     }
     
@@ -20,8 +20,8 @@
             ZWrite On
             ZTest LEqual
             Material {
-                Diffuse(1,1,1,1)
-                Ambient(1,1,1,1)
+                Diffuse(1, 1, 1, 1)
+                Ambient(1, 1, 1, 1)
             }
             SetTexture[_MainTex] { combine texture }
         }

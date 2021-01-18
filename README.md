@@ -8,12 +8,13 @@
   - [客户端](#客户端)
     - [场景](#场景)
       - [NO.1 在圆内随机生成点](#no1-在圆内随机生成点)
-      - [NO.2 跑马灯](#no2-跑马灯)
-      - [NO.3 虚拟摇杆](#no3-虚拟摇杆)
-      - [NO.4 小地图](#no4-小地图)
-      - [NO.5 聊天框](#no5-聊天框)
-    - [图形学](#图形学)
+      - [NO.2 虚拟摇杆](#no2-虚拟摇杆)
+      - [NO.3 小地图](#no3-小地图)
       - [Light 光照](#light-光照)
+        - [Lambert（兰伯特）：漫反射](#lambert兰伯特漫反射)
+        - [Half-Lambert（半-兰伯特）：漫反射优化](#half-lambert半-兰伯特漫反射优化)
+        - [Phong（冯氏）：高光反射](#phong冯氏高光反射)
+        - [Blinn-Phong（布林-冯氏）：高光反射优化](#blinn-phong布林-冯氏高光反射优化)
       - [Xray 透视](#xray-透视)
     - [算法](#算法)
       - [AStar 寻路算法](#astar-寻路算法)
@@ -25,16 +26,20 @@
       - [Lua下载](#lua下载)
       - [C++调用Lua](#c调用lua)
       - [Lua调用C++](#lua调用c)
+      - [MessagePack](#messagepack)
+      - [ENet](#enet)
+      - [Kcp](#kcp)
+      - [整合](#整合)
     - [Lua](#lua)
+      - [字节码](#字节码)
       - [面向对象](#面向对象)
       - [垃圾回收](#垃圾回收)
       - [高性能Lua](#高性能lua)
-      - [字节码](#字节码)
-      - [其他](#其他)
+      - [基础](#基础)
     - [游戏库](#游戏库)
       - [热更新](#热更新)
       - [序列化](#序列化)
-      - [运算](#运算)
+      - [其他算法](#其他算法)
     - [性能优化](#性能优化)
       - [火焰图](#火焰图)
       - [Postman](#postman)
@@ -76,110 +81,33 @@
     y = y\_center %2b \rho * sin(\theta)
 -->
 
-#### NO.2 跑马灯
+#### NO.2 虚拟摇杆
 
-1. 原理
-> * 跑马灯有区域限制，超出这个区域就不显示，这里我们用`Mask遮罩`实现。
-> * 以水平跑马灯为例：跑马灯的可视范围是背景宽度，文字从右边开始到左边结束，总共移动的距离是`背景宽度 + 文字宽度`。
-> * 跑马灯的动画实现使用了[`DOTween插件`](https://assetstore.unity.com/)。
+![虚拟摇杆](Unity-Tricks/images/虚拟摇杆.png)
 
-1. 前期准备
-> * 新建一个Image作为背景。调整适当大小。
-> * 背景下再新建一个Image。添加Mask组件，用于遮住背景之外的文字，Rect Transfrom设置为Stretch，四维全部设置为0，铺满背景。
-如果是水平滚动的将Rect Transform的Pivot设置为`1 0.5`，令Mask锚点位于`右边`。
-如果是垂直滚动的将Rect Transform的Pivot设置为`0.5 0`，令Mask锚点位于`下边`。
-> * Mask下创建Text，随意写些文字，居中显示，添加Content Size Fitter。
-如果是水平滚动的将`Horizontal Fit`设置为Preferred Size，将Rect Transform的Pivot设置为`0 0.5`，令Text锚点位于Mask处，方便实现从右往左动画。
-如果是垂直滚动的将`Vertical Fit`设置为Preferred Size，将Rect Transform的Pivot设置为`0.5 1`，令Text锚点位于Mask处，方便实现从下往上动画。
+#### NO.3 小地图
 
-#### NO.3 虚拟摇杆
-
-1. `定义委托`
-public delegate void JoyStickTouchBegin(Vector2 vec);  // 定义触摸开始事件委托
-public delegate void JoyStickTouchMove(Vector2 vec);  // 定义触摸过程事件委托
-public delegate void JoyStickTouchEnd();  // 定义触摸结束事件委托
-2. `注册事件`
-public event JoyStickTouchBegin OnJoyStickTouchBegin;  // 注册触摸开始事件
-public event JoyStickTouchMove OnJoyStickTouchMove;  // 注册触摸过程事件
-public event JoyStickTouchEnd OnJoyStickTouchEnd;  // 注册触摸结束事件
-3. `使用接口`：PointerDownHandler, IPointerUpHandler, IDragHandler  
-public void OnPointerDown(PointerEventData eventData)  // 触摸开始  
-public void OnPointerUp(PointerEventData eventData)  // 触摸结束  
-public void OnDrag(PointerEventData eventData)  // 触摸过程  
-4. `返回摇杆的偏移量`  
-
-```C#
-private Vector2 GetJoyStickAxis(PointerEventData eventData)
-{
-    // 获取手指位置的世界坐标
-    Vector3 worldPosition;
-    if (RectTransformUtility.ScreenPointToWorldPointInRectangle(selfTransform,
-             eventData.position, eventData.pressEventCamera, out worldPosition))
-        selfTransform.position = worldPosition;
-    // 获取摇杆偏移量
-    Vector2 touchAxis = selfTransform.anchoredPosition - originPosition;
-    // 摇杆偏移量限制
-    if (touchAxis.magnitude >= JoyStickRadius)
-    {
-        touchAxis = touchAxis.normalized * JoyStickRadius;
-        selfTransform.anchoredPosition = touchAxis;
-    }
-    return touchAxis;
-}
-```
-
-#### NO.4 小地图
-
-> * `UI准备`：Mask圆形遮罩，Minimap小地图边框。
-> * 添加一个新的相机，并命名为`Mini Camera`。然后将该相机设为 Player 的子对象，position设为(0, 10,0)，rotation设为(90, 0, 0)。
-> * 渲染到UI层需要用到Render Texture来实现。依次点击菜单项Assets -> Create -> Render Texture新建Render Texture，并命名为`Minimap Render`。选中Mini Camera后将Target Texture设为Minimap Render。
-> * 下面新建Canvas来添加UI元素。新建Raw Image，命名为`Map`，将Texture设为Minimap Render。
-> * 下面新建Image，命名为`Mask`，为其添加Mask组件，并将Image的Source Image设为上面的圆形遮罩。最后将Map设为Mask的子对象。
-> * 下面新建Image，命名为`Outline`，将Image的Source Image设为上面的小地图边框。
-> * 为了让整个小地图移动起来更方便，新建一个空的GameObject命名为`Minimap`，并将所有对象设为Minimap子对象。
-> * 最后层级如下：  
-`Minimap`  
----- `Mask`  
--------- `Map`  
----- `Outline`  
-
-#### NO.5 聊天框
-
-> * 重点难点：  
-1.需要控制别人和自己聊天框Item的位置  
-2.需要控制聊天框ScrollView的滚动  
-3.需要控制聊天框Item的宽度高度  
-4.需要控制聊天框ScrollView的伸长  
-5.需要移除历史聊天框Item  
-> * 基本UI组件有玩家输入框、发送按钮、聊天框Item、聊天框ScrollView。
-> * 聊天框Item有left和right两种，分别是别人和自己，以自己的聊天框right为例子:  
-1.新建一个Image作为`背景`，设置Anchor为(right, top)、Pivot为(1, 1)。  
-2.在背景下新建一个Image作为`头像`，设置Anchor为(right, bottom)和一个Text作为`文字`。  
-3.在头像下新建一个Text作为`名字`，设置Anchor为(right, middle)。  
-4.挂上ChatUI脚本，专门控制UI显示。
-5.将其制作成为Prefab，聊天框left同理。  
-> * 聊天框ScrollView：  
-新建一个ScrollView，设置Anchor为(stretch, stretch)，调整为适当大小。  
-
-### 图形学
+![小地图](Unity-Tricks/images/小地图.png)
 
 #### Light 光照
 
-1. Lambert（兰伯特）：漫反射
+![光照](Unity-Tricks/images/光照.png)
+
+##### Lambert（兰伯特）：漫反射
 
 ![math](https://render.githubusercontent.com/render/math?math=I_%7Bdiff%7D%20%3D%20K_d%20%5Cast%20I_l%20%5Cast%20%28N%20%5Ccdot%20L%29)
 
-2. Half-Lambert（半-兰伯特）：漫反射优化
+##### Half-Lambert（半-兰伯特）：漫反射优化
 
 ![math](https://render.githubusercontent.com/render/math?math=I_%7Bdiff%7D%20%3D%20K_d%20%5Cast%20I_l%20%5Cast%20%28%5Calpha%20%28N%20%5Ccdot%20L%29%20%2B%20%5Cbeta%29)
 
-3. Phong（冯氏）：高光反射
+##### Phong（冯氏）：高光反射
 
 ![math](https://render.githubusercontent.com/render/math?math=I_%7Bspec%7D%20%3D%20K_s%20%5Cast%20I_l%20%5Cast%20%28V%20%5Ccdot%20R%29%5E%7Bn_s%7D)
 
 ![math](https://render.githubusercontent.com/render/math?math=R%20%3D%202%20%5Cast%20%28N%20%5Ccdot%20L%29%20%5Cast%20N%20-%20L)
 
-4. Blinn-Phong（布林-冯氏）：高光反射优化
+##### Blinn-Phong（布林-冯氏）：高光反射优化
 
 ![math](https://render.githubusercontent.com/render/math?math=I_%7Bspec%7D%20%3D%20K_s%20%5Cast%20I_l%20%5Cast%20%28N%20%5Ccdot%20H%29%5E%7Bn_s%7D)
 
@@ -196,6 +124,8 @@ private Vector2 GetJoyStickAxis(PointerEventData eventData)
 
 #### Xray 透视
 
+![透视](Unity-Tricks/images/透视.png)
+
 第一遍透视绘制：ZWrite Off、Greater。（关闭深度缓存）
 
 第二遍正常绘制：ZWrite On、LEqual。
@@ -203,6 +133,10 @@ private Vector2 GetJoyStickAxis(PointerEventData eventData)
 ### 算法
 
 #### AStar 寻路算法
+
+![AStar](Unity-Tricks/images/AStar.gif)
+
+[A*寻路算法在Unity中的简单应用](https://www.jianshu.com/p/22dfcca70064)
 
 - 估价函数：f(n) = g(n) + h(n)
 - g(n)：从起点到节点n的最短路径。
@@ -364,15 +298,15 @@ public class UnitySingleton<T> : MonoBehaviour
 
 ### 架构
 
-1. [DOTS](https://unity.com/cn/dots/packages)：Data-Oriented Tech Stack，面向数据的技术堆栈
+- [DOTS](https://unity.com/cn/dots/packages)：Data-Oriented Tech Stack，面向数据的技术堆栈
 
 - ECS：数据和逻辑解耦，CPU缓存友好。
 - Job System：多核编程。
 - Burst Compiler：优化编译。
 
-2. 导包：Window -> Package Manager -> Add package from git URL -> com.unity.rendering.hybrid
+- 导包：Window -> Package Manager -> Add package from git URL -> com.unity.rendering.hybrid
 
-3. 调试：Window -> Analysis -> Entity Debugger
+- 调试：Window -> Analysis -> Entity Debugger
 
 > [UnityECS学习日记](https://blog.csdn.net/qq_36382054/category_9596750.html)
 > [EntityComponentSystemSamples](https://github.com/Unity-Technologies/EntityComponentSystemSamples)
@@ -398,9 +332,9 @@ liblua54.a -- 静态链接库
 lua54.dll -- 动态链接库
 ```
 
-1. `lua.h`: 声明了Lua提供的基础函数，其中包括创建新Lua环境的函数、调用Lua函数的函数、读写环境中的全局变量的函数，以及注册供Lua语言调用的新函数的函数，等等。lua.h中声明的所有内容都有一个前缀lua_（例如lua_pcall）。
-2. `lualib.h`: 声明了辅助库（auxiliary library, auxlib）所提供的函数，其中所有的声明均以luaL_开头（例如， luaL_loadstring）。
-3. `lauxlib.h`: 辅助库
+1. `lua.h`: 基础函数，均为lua_前缀。
+2. `lauxlib.h`: 辅助库，均为luaL_前缀。
+3. `lualib.h`: 标准库，大部分为luaopen_前缀，以及luaL_openlibs。
 
 【Lua和C之间通信的主要组件是无处不在的虚拟栈（stack），几乎所有的API调用都是在操作这个栈中的值，Lua与C之间所有的数据交换都是通过这个栈完成的。此外，还可以利用栈保存中间结果。】
 
@@ -428,6 +362,8 @@ add.cpp:
 
 int luaadd(int x, int y)
 {
+    int sum;
+
     /* the function name */
     lua_getglobal(L, "add");
 
@@ -441,7 +377,7 @@ int luaadd(int x, int y)
     lua_call(L, 2, 1);
 
     /* get the result */
-    int sum = (int)lua_tonumber(L, -1);
+    sum = (int)lua_tointeger(L, -1);
     lua_pop(L, 1);
 
     return sum;
@@ -449,218 +385,106 @@ int luaadd(int x, int y)
 ```
 
 ```Shell
-g++ add.cpp -o add -llua54 -L . -I ./include
+g++ add.cpp -o add -llua54 -L ./lib -I ./include
 => add.exe
 ```
 
 #### [Lua调用C++](http://gamedevgeek.com/tutorials/calling-c-functions-from-lua/)
 
 ```C++
-average.cpp:
+avg.cpp:
 
-extern "C" int average(lua_State * L)
+static int average(lua_State *L)
 {
+    /* get number of arguments */
+    int n = lua_gettop(L);
     double sum = 0;
-    int num = lua_gettop(L);//获取参数的个数
-    for (int i = 1; i <= num; i++)
-        sum += lua_tonumber(L, i);
-    //依次获取所有参数值，相加
-    lua_pushnumber(L, sum / num);//将平均数压如栈，供lua获取
+    int i;
 
-    return 1;//返回返回值个数，通知lua应该在栈里取几个值作为返回结果
+    /* loop through each argument */
+    for (i = 1; i <= n; i++)
+    {
+        /* total the arguments */
+        sum += lua_tonumber(L, i);
+    }
+
+    /* push the average */
+    lua_pushnumber(L, sum / n);
+
+    /* push the sum */
+    lua_pushnumber(L, sum);
+
+    /* return the number of results */
+    return 2;
 }
 ```
 
 ```Lua
 average.lua:
 
-local Mydll = require("Mydll")
-print(Mydll.average(1,2,3,4))
+avg, sum = average(10, 20, 30, 40, 50)
+
+print("The average is ", avg)
+print("The sum is ", sum)
 ```
 
 ```Shell
-g++ average.cpp -shared -o Mydll.dll -llua54 -L . -I ./include
-=> Mydll.dll
+g++ avg.cpp -o avg -llua54 -L ./lib -I ./include
+=> avg.exe
+```
+
+#### [MessagePack](https://msgpack.org/)
+
+It's like JSON. but fast and small.
+
+MessagePack is an efficient binary serialization format. It lets you exchange data among multiple languages like JSON. But it's faster and smaller. Small integers are encoded into a single byte, and typical short strings require only one extra byte in addition to the strings themselves.
+
+```Shell
+$ git clone https://github.com/msgpack/msgpack-c.git
+$ cd msgpack-c
+$ git checkout c_master
+
+$ mkdir build
+$ cd build
+$ cmake -G "MinGW Makefiles" ..
+$ mingw32-make
+生成 libmsgpackc.dll
+```
+
+#### [ENet](https://github.com/lsalzman/enet)
+
+ENet's purpose is to provide a relatively thin, simple and robust network communication layer on top of UDP (User Datagram Protocol).The primary feature it provides is optional reliable, in-order delivery of packets.
+
+ENet omits certain higher level networking features such as authentication, lobbying, server discovery, encryption, or other similar tasks that are particularly application specific so that the library remains flexible, portable, and easily embeddable.
+
+```Shell
+$ git clone https://github.com/lsalzman/enet
+
+$ mkdir build
+$ cd build
+$ cmake -G "MinGW Makefiles" ..
+$ mingw32-make
+生成 libenet.a
+```
+
+#### [Kcp](https://github.com/skywind3000/kcp)
+
+KCP是一个快速可靠协议，能以比 TCP 浪费 10%-20% 的带宽的代价，换取平均延迟降低 30%-40%，且最大延迟降低三倍的传输效果。纯算法实现，并不负责底层协议（如UDP）的收发，需要使用者自己定义下层数据包的发送方式，以 callback的方式提供给 KCP。 连时钟都需要外部传递进来，内部不会有任何一次系统调用。
+
+整个协议只有 ikcp.h, ikcp.c两个源文件，可以方便的集成到用户自己的协议栈中。也许你实现了一个P2P，或者某个基于 UDP的协议，而缺乏一套完善的ARQ可靠协议实现，那么简单的拷贝这两个文件到现有项目中，稍微编写两行代码，即可使用。
+
+- [可靠UDP，KCP协议快在哪？](https://wetest.qq.com/lab/view/391.html)
+
+#### 整合
+
+```Shell
+# Windows需要参数-lwinmm -lws2_32
+
+g++ server.cpp -o server -lenet -lmsgpackc -L ./lib -I ./include -lwinmm -lws2_32
+g++ client.cpp -o client -lenet -lmsgpackc -L ./lib -I ./include -lwinmm -lws2_32
 ```
 
 ### Lua
-
-#### 面向对象
-
-[云风的个人空间 : Lua 中实现面向对象](https://blog.codingnow.com/cloud/HomePage)
-A:方法名(参数) = A.方法名(A, 参数)
-setmetatable(table, metatable)：对指定table设置元表(metatable)，如果元表(metatable)中存在__metatable键值，setmetatable会失败。
-__index：当你通过键来访问table的时候，如果这个键没有值，那么Lua就会寻找该table的metatable（假定有metatable）中的__index键。
-
-```Lua
-local _class={}
- 
-function class(super)
-	local class_type={}
-	class_type.ctor=false
-	class_type.super=super
-	class_type.new=function(...) 
-			local obj={}
-			do
-				local create
-				create = function(c,...)
-					if c.super then
-						create(c.super,...)
-					end
-					if c.ctor then
-						c.ctor(obj,...)
-					end
-				end
- 
-				create(class_type,...)
-			end
-			setmetatable(obj,{ __index=_class[class_type] })
-			return obj
-		end
-	local vtbl={}
-	_class[class_type]=vtbl
- 
-	setmetatable(class_type,{__newindex=
-		function(t,k,v)
-			vtbl[k]=v
-		end
-	})
- 
-	if super then
-		setmetatable(vtbl,{__index=
-			function(t,k)
-				local ret=_class[super][k]
-				vtbl[k]=ret
-				return ret
-			end
-		})
-	end
- 
-	return class_type
-end
-```
-
-```Lua
-base_type=class()		-- 定义一个基类 base_type
- 
-function base_type:ctor(x)	-- 定义 base_type 的构造函数
-	print("base_type ctor")
-	self.x=x
-end
- 
-function base_type:print_x()	-- 定义一个成员函数 base_type:print_x
-	print(self.x)
-end
- 
-function base_type:hello()	-- 定义另一个成员函数 base_type:hello
-	print("hello base_type")
-end
-```
-
-```Lua
-test=class(base_type)	-- 定义一个类 test 继承于 base_type
- 
-function test:ctor()	-- 定义 test 的构造函数
-	print("test ctor")
-end
- 
-function test:hello()	-- 重载 base_type:hello 为 test:hello
-	print("hello test")
-end
-```
-
-```Lua
-a=test.new(1)	-- 输出两行，base_type ctor 和 test ctor 。这个对象被正确的构造了。
-a:print_x()	-- 输出 1 ，这个是基类 base_type 中的成员函数。
-a:hello()	-- 输出 hello test ，这个函数被重载了。
-```
-
-#### 垃圾回收
-
-1. 案例一：
-
-``` Lua
-function A()
-    collectgarbage("collect")--进行垃圾回收，减少干扰
-    PrintCount()
-    local a = {}
-    for i = 1, 5000 do
-        table.insert(a, {})
-    end
-    PrintCount()
-    collectgarbage("collect")
-    PrintCount()
-end
-
-A()
-PrintCount()
-collectgarbage("collect")
-PrintCount()
-```
-
-```text
-output:
-24
-426 -- 可以得出分配内存为426-24=402kb
-425 -- 因为局部变量a还在生命周期内，所以手动回收内存并没有影响
-425 -- 因为Lua的自动回收是每隔一段时间进行的，所以无影响
-24 -- 在执行手动回收后，分配的内存得到了回收，没有发生内存泄漏
-```
-
-2. 案例二：
-
-```Lua
-function A()
-    collectgarbage("collect")--进行垃圾回收，减少干扰
-    PrintCount()
-    a = {}--修改1
-    for i = 1, 5000 do
-        table.insert(a, {})
-    end
-    PrintCount()
-    collectgarbage("collect")
-    PrintCount()
-end
-
-A()
-PrintCount()
-collectgarbage("collect")
-PrintCount()
-
---修改2
-a = nil
-collectgarbage("collect")
-PrintCount()
-```
-
-```text
-output:
-24
-426
-425
-425
-425 -- 因为a改为了全局变量，所以没办法进行回收
-24 -- 将a置空，此时a就会被lua判定为垃圾，就能进行回收了
-```
-
-3. 总结
-尽量用局部变量，这样当其生命周期结束时，就能被回收；对于全局变量，可以根据使用情况置空，及时回收内存。另外，如果某些情况出现或即将出现内存占用过大的情况，可以考虑手动去进行垃圾回收。
-
-#### 高性能Lua
-
-1. 前言：不要优化，还是不要优化。优化前后要做性能测试。
-2. 基本事实：使用局部变量，避免动态编译。
-3. 关于表：数组or哈希表，开放定址法。哈希的大小必须为2的幂。
-老版Lua扩容会预分配空位，新版Lua扩容不会预分配空位，避免浪费内存空间，例子：点Point{x, y}。可以通过构造器避免重新哈希。
-{true, true, true} => 3个空位
-{x = 1, y = 2, z = 3} => 4个空位（浪费内存，浪费时间）
-删除表元素，表不会缩小，更好的做法是删除表本身。
-4. 关于字符串：Lua的字符串只有一份拷贝，变量只是引用类型。
-5. 3R原则：减少reduce，重用reuse，回收recycle。
-6. Tips：(1)LuaJIT；(2)Lua+C/C++。
-
-> [Lua Performance Tips](http://www.lua.org/gems/sample.pdf)
-> [高性能 Lua 技巧（译）](https://segmentfault.com/a/1190000004372649)
 
 #### 字节码
 
@@ -714,22 +538,185 @@ String值: b'@test.lua'
 ...
 详细分析可见：Lua5.3.5的字节码
 https://github.com/lua/lua/blob/063d4e4543088e7a21965bda8ee5a0f952a9029e/ldump.c
-https://www.jianshu.com/p/f5ae9b7b235c
+https://cloud.tencent.com/developer/article/1648925
 ```
 
-#### 其他
+#### 面向对象
+
+```Lua
+local _class = {}
+
+function class(super)
+    local class_type = {}
+    class_type.ctor = false
+    class_type.super = super
+    class_type.new = function(...)
+        local obj = {}
+        do
+            local create
+            create = function(c, ...)
+                if c.super then create(c.super, ...) end
+                if c.ctor then c.ctor(obj, ...) end
+            end
+
+            create(class_type, ...)
+        end
+        setmetatable(obj, {__index = _class[class_type]})
+        return obj
+    end
+    local vtbl = {}
+    _class[class_type] = vtbl
+
+    setmetatable(class_type, {__newindex = function(t, k, v) vtbl[k] = v end})
+
+    if super then
+        setmetatable(vtbl, {
+            __index = function(t, k)
+                local ret = _class[super][k]
+                vtbl[k] = ret
+                return ret
+            end
+        })
+    end
+
+    return class_type
+end
+```
+
+```Lua
+base_type = class() -- 定义一个基类 base_type
+
+function base_type:ctor(x) -- 定义 base_type 的构造函数
+    print("base_type ctor")
+    self.x = x
+end
+
+function base_type:print_x() -- 定义一个成员函数 base_type:print_x
+    print(self.x)
+end
+
+function base_type:hello() -- 定义另一个成员函数 base_type:hello
+    print("hello base_type")
+end
+```
+
+```Lua
+test = class(base_type) -- 定义一个类 test 继承于 base_type
+
+function test:ctor() -- 定义 test 的构造函数
+    print("test ctor")
+end
+
+function test:hello() -- 重载 base_type:hello 为 test:hello
+    print("hello test")
+end
+```
+
+```Lua
+a = test.new(1) -- 输出两行，base_type ctor 和 test ctor 。这个对象被正确的构造了。
+a:print_x() -- 输出 1 ，这个是基类 base_type 中的成员函数。
+a:hello() -- 输出 hello test ，这个函数被重载了。
+```
+
+- [云风的个人空间 : Lua 中实现面向对象](https://blog.codingnow.com/cloud/HomePage)
+
+#### 垃圾回收
+
+- 案例一：
+
+``` Lua
+function A()
+    collectgarbage("collect") -- 进行垃圾回收，减少干扰
+    PrintCount()
+    local a = {}
+    for i = 1, 5000 do
+        table.insert(a, {})
+    end
+    PrintCount()
+    collectgarbage("collect")
+    PrintCount()
+end
+
+A()
+PrintCount()
+collectgarbage("collect")
+PrintCount()
+```
+
+```text
+output:
+21
+423 -- 分配内存为423-21=402kb。
+423 -- 局部变量，生命周期，没有办法进行回收。
+423 -- GC每隔一段时间才会自动回收。
+21 -- 手动回收。
+```
+
+- 案例二：
+
+```Lua
+function A()
+    collectgarbage("collect") -- 进行垃圾回收，减少干扰
+    PrintCount()
+    a = {} -- 修改1
+    for i = 1, 5000 do
+        table.insert(a, {})
+    end
+    PrintCount()
+    collectgarbage("collect")
+    PrintCount()
+end
+
+A()
+PrintCount()
+collectgarbage("collect")
+PrintCount()
+
+-- 修改2
+a = nil
+collectgarbage("collect")
+PrintCount()
+```
+
+```text
+output:
+21
+423
+423
+423
+423 -- 全局变量，生命周期，没有办法进行回收。
+21 -- 将a置空，手动回收。
+```
+
+#### 高性能Lua
+
+1. 前言：不要优化，还是不要优化。优化前后要做性能测试。
+2. 基本事实：使用局部变量，避免动态编译。
+3. 关于表：数组or哈希表，开放定址法。哈希的大小必须为2的幂。
+老版Lua扩容会预分配空位，新版Lua扩容不会预分配空位，避免浪费内存空间，例子：点Point{x, y}。可以通过构造器避免重新哈希。
+{true, true, true} => 3个空位
+{x = 1, y = 2, z = 3} => 4个空位（浪费内存，浪费时间）
+删除表元素，表不会缩小，更好的做法是删除表本身。
+4. 关于字符串：Lua的字符串只有一份拷贝，变量只是引用类型。
+5. 3R原则：减少reduce，重用reuse，回收recycle。
+6. Tips：(1)LuaJIT；(2)Lua+C/C++。
+
+- [Lua Performance Tips](http://www.lua.org/gems/sample.pdf)
+- [高性能 Lua 技巧（译）](https://segmentfault.com/a/1190000004372649)
+
+#### 基础
 
 - .与:的区别
 
 ```Lua
-function obj:fun1()
-    print(self.x)
+function obj:fun()
+  print(self.x)
 end
 
 等价于
 
-function obj.fun1(self)
-    print(self.x)
+function obj.fun(self)
+  print(self.x)
 end
 ```
 
@@ -769,7 +756,7 @@ end
 
 -- string转table
 s = "{1, 2, 3}"
-t = loadstring("return " .. s)()
+t = load("return " .. s)()
 print(t) -- table: 0x...
 ```
 
@@ -794,9 +781,6 @@ stdin:1: in main chunk
 false        nil
 ```
 
-1. [Lua 教程](https://www.runoob.com/lua/lua-tutorial.html)
-2. [OpenResty 最佳实践](https://moonbingbing.gitbooks.io/openresty-best-practices/content/)
-
 ### 游戏库
 
 [Lume](https://github.com/rxi/lume): A collection of functions for Lua, geared towards game development.
@@ -806,23 +790,23 @@ false        nil
 ```Lua
 -- 暴力热更
 function reload_module(module_name)
-    package.loaded[module_name] = nil
-    require(module_name)
+  package.loaded[module_name] = nil
+  require(module_name)
 end
 
 -- 优化热更
 function reload_module(module_name)
-    local old_module = _G[module_name]
+  local old_module = _G[module_name]
 
-    package.loaded[module_name] = nil
-    require(module_name)
+  package.loaded[module_name] = nil
+  require(module_name)
 
-    local new_module = _G[module_name]
-    for k, v in pairs(new_module) do
-        old_module[k] = v
-    end
+  local new_module = _G[module_name]
+  for k, v in pairs(new_module) do
+    old_module[k] = v
+  end
 
-    package.loaded[module_name] = old_module
+  package.loaded[module_name] = old_module
 end
 ```
 
@@ -883,7 +867,7 @@ lume.serialize({a = "test", b = {1, 2, 3}, false})
 -- Returns "{[1]=false,["a"]="test",["b"]={[1]=1,[2]=2,[3]=3,},}"
 ```
 
-#### 运算
+#### 其他算法
 
 ```Lua
 lume.random([a [, b]])
@@ -898,41 +882,56 @@ lume.sort(t [, comp])
 
 #### 火焰图
 
-![火焰图](docs/火焰图.jpg)
+![火焰图](FrameGraph/example.svg)
 火焰图是基于 perf 结果产生的 SVG 图片，用来展示 CPU 的调用栈。
+
 y 轴表示调用栈，每一层都是一个函数。调用栈越深，火焰就越高，顶部就是正在执行的函数，下方都是它的父函数。
+
 x 轴表示抽样数，如果一个函数在 x 轴占据的宽度越宽，就表示它被抽到的次数多，即执行的时间长。注意，x 轴不代表时间，而是所有的调用栈合并后，按字母顺序排列的。
-火焰图就是看顶层的哪个函数占据的宽度最大。只要有"平顶"（plateaus），就表示该函数可能存在性能问题。
+
+火焰图就是看顶层的哪个函数占据的宽度最大。只要有“平顶”（plateaus），就表示该函数可能存在性能问题。
+
 颜色没有特殊含义，因为火焰图表示的是 CPU 的繁忙程度，所以一般选择暖色调。
 
 ```text
 # 安装perf
 yum install perf
-# 下载火焰图工具
+
+# 下载火焰图
 git clone https://github.com/brendangregg/FlameGraph.git
+
 # 捕获堆栈
 perf record -F 99 -p 181 -g -- sleep 60
-【perf record表示记录，-F 99表示每秒99次，-p 13204表示分析的进程号，-g表示记录调用栈，sleep 30表示持续30秒。】
+
+-F 99：每秒99次。
+-p 181：进程号。
+-g：记录调用栈。
+sleep 60：持续60秒。
+
 # 解析堆栈
 perf script > out.stacks
+
 # 折叠堆栈
 ./stackcollapse-perf.pl out.stacks > out.folded
-# 生成svg火焰图
+
+# 生成火焰图
 ./flamegraph.pl out.folded > perf.svg
+
 # 使用管道简化命令
 perf script | ./stackcollapse-perf.pl | ./flamegraph.pl > perf.svg
+
 # 红蓝差分火焰图（红色上升，蓝色下降。）
 ./difffolded.pl out.folded1 out.folded2 | ./flamegraph.pl > diff.svg
 
 不足之处：http://www.brendangregg.com/blog/2014-11-09/differential-flame-graphs.html
-虽然红/蓝差分火焰图很有用，但实际上还是有一个问题：如果一个代码执行路径完全消失了，那么在火焰图中就找不到地方来标注蓝色。你只能看到当前的CPU使用情况，而不知道为什么会变成这样。一个办法是，将对比顺序颠倒，画一个相反的差分火焰图。
+如果一个代码执行路径完全消失了，那么在火焰图中就找不到地方来标注蓝色。
+你只能看到当前的 CPU 使用情况，而不知道为什么会变成这样。
+一个办法是，将对比顺序颠倒，画一个相反的差分火焰图。
 ./difffolded.pl out.folded1 out.folded2 | ./flamegraph.pl > diff2.svg
 ./difffolded.pl out.folded2 out.folded1 | ./flamegraph.pl --negate > diff1.svg
-diff1.svg：宽度是以修改前profile文件为基准，颜色表明将要发生的情。
+diff1.svg：宽度是以修改前profile文件为基准，颜色表明将要发生的情况。
 diff2.svg：宽度是以修改后profile文件为基准，颜色表明已经发生的情况。
 ```
-
-案例分析
 
 ```C
 int i() { for(int i = 0; i < 20000; i++) {}; }
@@ -952,19 +951,18 @@ int c() { d(); }
 int b() { c(); }
 
 int a() { b(); h(); }
+
+> g++ main.cpp -o main
+> ./main
 ```
 
-编译
-g++ main1.cpp -o main1
-运行
-./main1
-结果perf.svg
-![火焰图测试](docs/火焰图测试.png)
+![火焰图测试](FrameGraph/perf.svg)
 
-1. [动态追踪技术漫谈](https://blog.openresty.com.cn/cn/dynamic-tracing/)
-2. [Lua 级别 CPU 火焰图简介](https://blog.openresty.com.cn/cn/lua-cpu-flame-graph/)
-3. [《性能之巅》学习笔记之火焰图 其之一](https://zhuanlan.zhihu.com/p/73385693)
-4. [《性能之巅》学习笔记之火焰图 其之二](https://zhuanlan.zhihu.com/p/73482910)
+- [动态追踪技术漫谈](https://blog.openresty.com.cn/cn/dynamic-tracing/)
+- [Lua 级别 CPU 火焰图简介](https://blog.openresty.com.cn/cn/lua-cpu-flame-graph/)
+- [《性能之巅》学习笔记之火焰图 其之一](https://zhuanlan.zhihu.com/p/73385693)
+- [《性能之巅》学习笔记之火焰图 其之二](https://zhuanlan.zhihu.com/p/73482910)
+- [OpenResty 最佳实践](https://moonbingbing.gitbooks.io/openresty-best-practices/content/)
 
 #### [Postman](https://www.postman.com/)
 
@@ -976,31 +974,10 @@ g++ main1.cpp -o main1
 
 #### VSCode
 
-- 通用配置
-  - Chinese (Simplified) Language Pack for Visual Studio Code
-  - vscode-icons
-- 远程连接
-  - Remote - SSH
-  - Remote - SSH: Editing Configuration Files
-- Code
-  - Code Runner
-  - C++
-    - [MinGW](https://sourceforge.net/projects/mingw-w64/files/) (x86_64-posix-sjlj)
-  - Python
-    - [Anaconda](https://repo.anaconda.com/archive/)
-  - Lua
-    - [Lua](http://luabinaries.sourceforge.net/download.html)
-    - [LuaJit](https://luajit.org/download.html)
-- Markdown
-  - Markdown All in One
-  - Markdown Preview Github Styling
-  - Markdown TOC
-  - Markdown Emoji
-  - markdownlint
-
 ```JSON
 "editor.fontSize": 16,
 "editor.fontFamily": "Consolas",
+"window.zoomLevel": 0,
 "workbench.colorTheme": "Default Light+",
 "workbench.iconTheme": "vscode-icons",
 "workbench.editor.enablePreview": false,
@@ -1013,3 +990,38 @@ g++ main1.cpp -o main1
     "--disable=missing-docstring", "--disable=invalid-name"
 ]
 ```
+
+- 通用配置
+  - Chinese (Simplified) Language Pack for Visual Studio Code
+  - vscode-icons
+- 远程连接
+  - Remote - SSH
+  - Remote - SSH: Editing Configuration Files
+- Unity
+  - Debugger for Unity
+  - Unity Tools
+  - Unity Code Snippets
+- Code
+  - Code Runner
+  - C#
+    - [.Net Core](https://dotnet.microsoft.com/download) (.Net Core 3.1)
+    - [.Net Framework](https://dotnet.microsoft.com/download) (.NET Framework 4.7.1)
+  - C++
+    - [MinGW](https://osdn.net/projects/mingw/releases/) (mingw-get-setup.exe)
+    - [CMake](https://cmake.org/download/) (cmake-3.19.0-win64-x64.msi)
+  - Lua
+    - [Lua Executables](http://luabinaries.sourceforge.net/download.html) (lua-5.4.0_win64_bin.zip)
+    - [Lua DLL and Includes](http://luabinaries.sourceforge.net/download.html) (lua-5.4.0_Win64_dllw6_lib.zip)
+  - Python
+    - [Anaconda](https://repo.anaconda.com/archive/) (Anaconda3-2020.11-Windows-x86_64.exe)
+    - [Python](https://www.python.org/downloads/) (Python 3.8.6)
+- Markdown
+  - Markdown All in One
+  - Markdown Preview Github Styling
+  - Markdown TOC
+  - Markdown Emoji
+  - markdownlint
+
+1. Untiy默认编辑器：Edit –> Preferences -> External Tools -> External Script Editor
+=> `Visual Studio Code`
+2. Untiy默认模板：C:\Program Files\Unity\Editor\Data\Resources\ScriptTemplates => `81-C# Script-NewBehaviourScript.cs.txt`

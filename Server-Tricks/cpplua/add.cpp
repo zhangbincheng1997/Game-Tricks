@@ -1,4 +1,4 @@
-﻿#include <stdio.h>
+#include <stdio.h>
 
 extern "C"
 {
@@ -12,44 +12,52 @@ lua_State *L;
 
 int luaadd(int x, int y)
 {
-	/* the function name */
-	lua_getglobal(L, "add");
+    int sum;
 
-	/* the first argument */
-	lua_pushnumber(L, x);
+    /* the function name */
+    lua_getglobal(L, "add");
 
-	/* the second argument */
-	lua_pushnumber(L, y);
+    /* the first argument */
+    lua_pushnumber(L, x);
 
-	/* call the function with 2 arguments, return 1 result */
-	lua_call(L, 2, 1);
+    /* the second argument */
+    lua_pushnumber(L, y);
 
-	/* get the result */
-	int sum = (int)lua_tonumber(L, -1);
-	lua_pop(L, 1);
+    /* call the function with 2 arguments, return 1 result */
+    lua_call(L, 2, 1);
 
-	return sum;
+    /* get the result */
+    sum = (int)lua_tointeger(L, -1);
+    lua_pop(L, 1);
+
+    return sum;
 }
 
 int main(int argc, char *argv[])
 {
-	/* initialize Lua */
-	L = luaL_newstate();
+    int sum;
 
-	/* load Lua base libraries */
-	luaL_openlibs(L);
+    /* initialize Lua */
+    L = luaL_newstate();
 
-	/* load the script */
-	luaL_dofile(L, "add.lua");
+    /* load Lua base libraries */
+    luaL_openlibs(L);
 
-	/* call the add function */
-	int sum = luaadd(10, 15);
+    /* load the script */
+    luaL_dofile(L, "add.lua");
 
-	/* print the result */
-	printf("The sum is %d", sum);
+    /* call the add function */
+    sum = luaadd(10, 15);
 
-	/* cleanup Lua */
-	lua_close(L);
+    /* print the result */
+    printf("The sum is %d\n", sum);
 
-	return 0;
+    /* cleanup Lua */
+    lua_close(L);
+
+    /* pause */
+    printf("Press enter to exit...");
+    getchar();
+
+    return 0;
 }
